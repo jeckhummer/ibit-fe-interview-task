@@ -1,0 +1,8 @@
+.cache
+dist
+node_modules
+built-lambdas
+# Local Netlify folder
+.netlify
+habbits-4afbd-firebase-adminsdk-gy3gp-2265c89b40.json
+.vscode
