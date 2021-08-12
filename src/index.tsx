@@ -2,8 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './components/App';
+import { buildServices, ServiceProvider } from './services';
 
 import './normalize.css';
 import './index.scss';
 
-ReactDOM.render(<App />, document.getElementById('app'));
+const services = buildServices();
+
+ReactDOM.render(
+    <ServiceProvider services={services}>
+        <App />
+    </ServiceProvider>,
+    document.getElementById("app"),
+);

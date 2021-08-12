@@ -1,20 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import { Deal } from '../models';
 
-const Wrapper = styled.div`
-    display: flex;
-    align-items: center;
-    /* justify-content: center; */
-    flex-direction: column;
-`;
-const Mock = styled.div`
-    height: 370px;
-    width: 100%;
-    color: white;color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
 const Button = styled.button`
     font-weight: 700;
     font-size: 16px;
@@ -26,15 +13,26 @@ const Button = styled.button`
     color: #00A3FF;
 `;
 
-export const Table: React.FC = () => {
+export const Table: React.FC<{
+    deals: Deal[];
+    onNextPageButtonClick: () => void;
+    nextPageAvailable: boolean;
+}> = ({
+    deals,
+    onNextPageButtonClick,
+    nextPageAvailable,
+}) => {
     return (
-        <Wrapper>
-            <Mock>
-                Table
-            </Mock>
-            <Button>
-                Load next page
-            </Button>
-        </Wrapper>
+        <>
+            {deals.map(x => (
+                <div key={x.id}>{x.value} -- {x.date}</div>
+            ))}
+
+            {nextPageAvailable && (
+                <Button onClick={onNextPageButtonClick}>
+                    Load next page
+                </Button>
+            )}
+        </>
     );
 };
