@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { useAsyncDeals } from "../hooks";
+import { Deal } from "../models";
 import { Chart } from "./Chart";
 import { Header } from "./Header";
 import { Table } from "./Table";
@@ -25,6 +26,7 @@ const ButtonWrapper = styled.div`
 
 const App: React.FC = () => {
     const {dealsAsync, loadNextPage} = useAsyncDeals();
+    const [selected, setSelected] = React.useState<Deal | null>(null);
 
     // triggers first fetching
     React.useEffect(loadNextPage, []);
@@ -42,8 +44,16 @@ const App: React.FC = () => {
             {dealsAsync.status === 'error' && <>Error: {dealsAsync.error}</>}
             {(dealsAsync.status === 'success' || dealsAsync.status === 'loading' && !dealsAsync.initial) && (
                 <>
-                    <Chart deals={dealsAsync.data.data}/>
-                    <Table deals={dealsAsync.data.data} />
+                    <Chart
+                        selectedDeal={selected}
+                        onDealSelect={setSelected}
+                        deals={dealsAsync.data.data}
+                    />
+                    <Table
+                        selectedDeal={selected}
+                        onDealSelect={setSelected}
+                        deals={dealsAsync.data.data} 
+                    />
                     {dealsAsync.data.hasNextPage && (
                         <ButtonWrapper>
                             <Button onClick={loadNextPage}>

@@ -20,16 +20,23 @@ const TH = styled.td`
 const TD = styled.td<{secondary?: boolean}>`
     padding: 17px 20px;
     font-weight: ${props => props.secondary ? 400 : 700};
-    color: #CAD3E8;
     border: 1px solid #343E4D;
     border-left: 0;
     border-right: 0;
+    `;
+const TR = styled.tr<{selected?: boolean}>`
+    color: ${props => props.selected ? 'white' : '#CAD3E8'};
+    background-color: ${props => props.selected ? 'rgba(133, 211, 255, 0.09)' : 'transparent'};
 `;
 
 export const Table: React.FC<{
     deals: Deal[];
+    selectedDeal: Deal | null,
+    onDealSelect: (deal: Deal) => void,
 }> = ({
     deals,
+    selectedDeal,
+    onDealSelect,
 }) => {
     return (
         <_Table>
@@ -41,10 +48,14 @@ export const Table: React.FC<{
             </thead>
             <TBody>
                 {deals.map(x => (
-                    <tr key={x.id}>
+                    <TR 
+                        onClick={() => onDealSelect(x)} 
+                        selected={x === selectedDeal} 
+                        key={x.id}
+                    >
                         <TD> {x.value} </TD>
-                        <TD secondary> {dateformat(x.date, "dd mmm yyyy HH:MM:ss")} </TD>
-                    </tr>
+                        <TD secondary> {dateformat(x.date, "dd mmm yyyy HH:MM:ss", true)} </TD>
+                    </TR>
                 ))}
             </TBody>
 
