@@ -9,6 +9,7 @@ const Canvas = styled.canvas`
 
 const PADDING = 20;
 const JOINT_RADIUS = 5; // not that "joint" 😝
+const SELECTION_TRIGGER_RADIUS = 15;
 const GRAPH_WIDTH = 4;
 
 export const Chart: React.FC<{
@@ -17,7 +18,9 @@ export const Chart: React.FC<{
     onDealSelect: (deal: Deal) => void,
 }> = ({ deals, selectedDeal, onDealSelect }) => {
     const canvasRef = React.useRef<HTMLCanvasElement>(null);
-    const jointPaths = React.useRef<{ path: Path2D, deal: Deal }[]>([]);
+    // circle areas surrounding all deal-points (joints on graph)
+    // they are necessary to register user clicks for deal selection.
+    const selectionTriggers = React.useRef<{ path: Path2D, deal: Deal }[]>([]);
 
     // preparations of the canvas on mount
     React.useEffect(
@@ -46,6 +49,9 @@ export const Chart: React.FC<{
         () => {
             const canvas = canvasRef.current!;
             const ctx = canvas.getContext('2d')!;
+
+            // clean selection triggers
+            selectionTriggers.current = [];
             
             // clean the canvas
             ctx.restore();
@@ -86,15 +92,18 @@ export const Chart: React.FC<{
             
             // draw joints
             points.forEach(({x, y, deal}, i) => {
-                const jointPath = new Path2D();
-                jointPath.arc(x, y, JOINT_RADIUS, 0, Math.PI * 2);
-                jointPaths.current.push({path: jointPath, deal});
+                const trigger = new Path2D();
+                trigger.arc(x, y, SELECTION_TRIGGER_RADIUS, 0, Math.PI * 2);
+                selectionTriggers.current.push({ path: trigger, deal });
+
+                ctx.beginPath();
+                ctx.arc(x, y, JOINT_RADIUS, 0, Math.PI * 2)
 
                 ctx.save();
                 if (deal === selectedDeal) {
                     ctx.fillStyle = "red";
                 }
-                ctx.fill(jointPath);
+                ctx.fill();
                 ctx.restore();
             });
         },
@@ -104,7 +113,7 @@ export const Chart: React.FC<{
     const onClick = React.useCallback(
         ({ nativeEvent: { offsetX, offsetY }}: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
             const ctx = canvasRef.current?.getContext('2d')!;
-            const clickedJoint = jointPaths.current.find(({ path }) =>
+            const clickedJoint = selectionTriggers.current.find(({ path }) =>
                 ctx.isPointInPath(path, offsetX, offsetY));
 
             if (clickedJoint) {
