@@ -24,6 +24,14 @@ const ButtonWrapper = styled.div`
     margin-top: 24px;
 `;
 
+const FullScreenMessage = styled.div`
+    display: flex;
+    height: calc(100vh - 60px);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+`;
+
 const App: React.FC = () => {
     const {dealsAsync, loadNextPage} = useAsyncDeals();
     const [selected, setSelected] = React.useState<Deal | null>(null);
@@ -40,8 +48,12 @@ const App: React.FC = () => {
             <br/>
             [TODO] Error handling
             <br/> */}
-            {dealsAsync.status === 'loading' && dealsAsync.initial && <>Loading...</>}
-            {dealsAsync.status === 'error' && <>Error: {dealsAsync.error}</>}
+            {dealsAsync.status === 'loading' && dealsAsync.initial && (
+                <FullScreenMessage> LOADING... </FullScreenMessage>
+            )}
+            {dealsAsync.status === 'error' && (
+                <FullScreenMessage> Error: {dealsAsync.error.message} </FullScreenMessage>
+            )}
             {(dealsAsync.status === 'success' || dealsAsync.status === 'loading' && !dealsAsync.initial) && (
                 <>
                     <Chart
