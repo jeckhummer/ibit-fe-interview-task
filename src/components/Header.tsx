@@ -23,7 +23,6 @@ const Logo = styled.img.attrs({src: logo})`
 `;
 const ProductName = styled.span`
     margin-left: 7px;
-    color: white;
     font-weight: 100;
     font-size: 21px;
 `;
@@ -35,7 +34,6 @@ const NewDealButton = styled.button`
     border-radius: 6px;
     border: 0px;
     padding: 6px 10px;
-    color: white;
 `;
 
 export const Header: React.FC = () => {

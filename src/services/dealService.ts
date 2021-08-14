@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 
-import { PaginatedDeals } from "../models";
+import { DealDTO, PaginatedData, PaginatedDeals } from "../models";
 
 export interface IDealService {
     getDealsPage: (page?: number) => Promise<PaginatedDeals>;
@@ -13,7 +13,14 @@ export class DealService implements IDealService {
         const qs = page !== undefined
             ? '?page=' + page
             : '';
+        const dto = (await this.axios.get<PaginatedData<DealDTO>>('/deals' + qs)).data;
 
-        return (await this.axios.get<PaginatedDeals>('/deals' + qs)).data;
+        return {
+            ...dto,
+            data: dto.data.map(x => ({
+                ...x,
+                date: new Date(x.date)
+            })),
+        };
     };
 }

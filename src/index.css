@@ -7,6 +7,10 @@ body,
 }
 
 body {
-  font-family: "Roboto", sans-serif;
   background: #282f39;
+}
+
+body * {
+  font-family: "Roboto", sans-serif;
+  color: white;
 }

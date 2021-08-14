@@ -5,7 +5,7 @@ import App from './components/App';
 import { buildServices, ServiceProvider } from './services';
 
 import './normalize.css';
-import './index.scss';
+import './index.css';
 
 const services = buildServices();
 
