@@ -57,7 +57,10 @@ const App: React.FC = () => {
                     {dealsAsync.data.hasNextPage && (
                         <ButtonWrapper>
                             <Button onClick={loadNextPage}>
-                                Load next page
+                                {dealsAsync.status === 'loading' 
+                                    ? "Loading..."
+                                    : "Load next page"
+                                }
                             </Button>
                         </ButtonWrapper>
                     )}
