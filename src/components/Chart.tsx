@@ -9,8 +9,14 @@ const Canvas = styled.canvas`
 
 const PADDING = 20;
 const JOINT_RADIUS = 5; // not that "joint" 😝
+const JOINT_COLOR = '#8fd6ff';
 const SELECTION_TRIGGER_RADIUS = 15;
 const GRAPH_WIDTH = 4;
+const GRID_WIDTH = 1;
+const GRID_CELLS_HORIZONTAL_COUNT = 10;
+const GRID_CELLS_VERTICAL_COUNT = 6;
+const GRID_COLOR = 'rgba(248, 243, 235, 0.219)';
+const GRAPH_COLOR = '#00A3FF';
 
 export const Chart: React.FC<{
     deals: Deal[],
@@ -33,12 +39,6 @@ export const Chart: React.FC<{
             ctx.translate(0, canvas.height);
             ctx.scale(1,-1);
 
-            // line styling
-            ctx.strokeStyle = "#00A3FF";
-            ctx.fillStyle = "#8fd6ff";
-            ctx.lineWidth = GRAPH_WIDTH;
-            ctx.lineJoin = 'round';
-
             ctx.save();
         },
         []
@@ -58,28 +58,47 @@ export const Chart: React.FC<{
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
 
-            // apply padding
-            ctx.translate(PADDING, PADDING);
-            ctx.scale(
-                (canvas.width - PADDING * 2) / canvas.width, 
-                (canvas.height - PADDING * 2) / canvas.height
-            );
+            // draw the grid
+            ctx.strokeStyle = GRID_COLOR;
+            ctx.lineWidth = GRID_WIDTH;
 
-            // normalization
+            const xGridStep = Math.ceil(canvas.width / GRID_CELLS_HORIZONTAL_COUNT);
+            const yGridStep = canvas.height / GRID_CELLS_VERTICAL_COUNT;
+
+            for (let i = 1; i < GRID_CELLS_HORIZONTAL_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(xGridStep * i, 0);
+                ctx.lineTo(xGridStep * i, canvas.height);
+                ctx.stroke();
+            }
+
+            for (let i = 1; i < GRID_CELLS_VERTICAL_COUNT; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, yGridStep * i);
+                ctx.lineTo(canvas.width, yGridStep * i);
+                ctx.stroke();
+            }
+            
+            // normalization + apply padding
             const maxValue = Math.max(...deals.map(x => x.value));
             const unixDates = deals.map(x => +x.date);
             const minDate = Math.min(...unixDates);
             const maxDate = Math.max(...unixDates);
             const dateDelta = maxDate - minDate;
             const points = deals.map(deal => ({
-                x: ((+deal.date) - minDate) / dateDelta * canvas.width,
+                x: ((+deal.date) - minDate) / dateDelta * (canvas.width - PADDING * 2) + PADDING,
                 // I assume that deal price is always >= 0.
                 // Otherwise should be `(maxValue - minValue)` instead of just `maxValue`
-                y: canvas.height / maxValue * deal.value,
+                y: (canvas.height - PADDING * 2) / maxValue * deal.value + PADDING,
                 deal
             }));
 
             // draw the graph
+            ctx.strokeStyle = GRAPH_COLOR;
+            ctx.lineWidth = GRAPH_WIDTH;
+            ctx.fillStyle = JOINT_COLOR;
+            ctx.lineJoin = 'round';
+            
             ctx.beginPath();
             points.forEach(({x, y}, i) => {
                 if (i === 0) {
@@ -96,15 +115,31 @@ export const Chart: React.FC<{
                 trigger.arc(x, y, SELECTION_TRIGGER_RADIUS, 0, Math.PI * 2);
                 selectionTriggers.current.push({ path: trigger, deal });
 
-                ctx.beginPath();
-                ctx.arc(x, y, JOINT_RADIUS, 0, Math.PI * 2)
-
-                ctx.save();
                 if (deal === selectedDeal) {
-                    ctx.fillStyle = "red";
+                    ctx.fillStyle = 'rgba(132, 211, 255, 0.33)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+
+                    ctx.fillStyle = 'rgba(132, 211, 255, 0.53)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, JOINT_RADIUS * 2, 0, Math.PI * 2);
+                    ctx.fill();
                 }
+
+                ctx.fillStyle = JOINT_COLOR;
+                ctx.beginPath();
+                ctx.arc(x, y, JOINT_RADIUS, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.restore();
+                // ctx.save();
+                // ctx.restore();
             });
         },
         [deals, selectedDeal]

@@ -34,12 +34,12 @@ const App: React.FC = () => {
     return (
         <>
             <Header/>
-            [TODO] Error boundary
+            {/* [TODO] Error boundary
             <br/>
             [TODO] Loader
             <br/>
             [TODO] Error handling
-            <br/>
+            <br/> */}
             {dealsAsync.status === 'loading' && dealsAsync.initial && <>Loading...</>}
             {dealsAsync.status === 'error' && <>Error: {dealsAsync.error}</>}
             {(dealsAsync.status === 'success' || dealsAsync.status === 'loading' && !dealsAsync.initial) && (
@@ -61,6 +61,9 @@ const App: React.FC = () => {
                             </Button>
                         </ButtonWrapper>
                     )}
+                    <br/>
+                    <br/>
+                    <br/>
                 </>
             )}
         </>
